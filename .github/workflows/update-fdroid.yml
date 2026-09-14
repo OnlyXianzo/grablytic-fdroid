@@ -1,0 +1,58 @@
+name: Update F-Droid Repository
+
+# Self-hosted TrueStream F-Droid repo (https://onlyxianzo.github.io/truestream-fdroid/).
+# Moved to repo root: GitHub Actions only runs workflows from .github/workflows/
+# at the repository root (Priya's draft lived under a nested dir and never ran).
+# Triggers: schedule (daily), manual dispatch, or repository_dispatch 'new-release'
+# sent by OnlyXianzo/TrueStream on every published release.
+
+on:
+  repository_dispatch:
+    types: [new-release]
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * *'
+
+jobs:
+  update-repo:
+    name: Build and Sign F-Droid Index
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install fdroidserver
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fdroidserver
+
+      - name: Download latest APKs from TrueStream
+        run: |
+          mkdir -p repo
+          gh release download v0.0.1 --repo OnlyXianzo/TrueStream --pattern "*.apk" --dir repo/ --clobber
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Restore signing keystore
+        if: ${{ secrets.FDROID_KEYSTORE_BASE64 != '' }}
+        run: echo "${{ secrets.FDROID_KEYSTORE_BASE64 }}" | base64 -d > keystore.jks
+
+      - name: Update F-Droid index (signed when keystore present)
+        run: |
+          if [ -f keystore.jks ]; then
+            fdroid update --create-metadata
+          else
+            echo "::warning::FDROID_KEYSTORE_BASE64 not set — publishing UNSIGNED index (clients will warn). Add secret to sign."
+            fdroid update --create-metadata --nosign
+          fi
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./
