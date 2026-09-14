@@ -54,12 +54,14 @@ jobs:
           fi
 
       - name: Update F-Droid index (signed when keystore present)
+        # Modern fdroidserver refuses to publish unsigned indexes, so without
+        # a keystore this fails fast with directions (see README "Signing").
         run: |
           if [ -f keystore.jks ]; then
             fdroid update --create-metadata
           else
-            echo "::warning::FDROID_KEYSTORE_BASE64 not set — publishing UNSIGNED index (clients will warn). Add secret to sign."
-            fdroid update --create-metadata --nosign
+            echo "::error::FDROID_KEYSTORE_BASE64 secret not set — refusing to publish an unsigned index. One-time setup: see README 'Signing the repository', then re-run."
+            exit 1
           fi
 
       - name: Deploy to GitHub Pages
