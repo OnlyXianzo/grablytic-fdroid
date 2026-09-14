@@ -39,8 +39,15 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Restore signing keystore
-        if: ${{ secrets.FDROID_KEYSTORE_BASE64 != '' }}
-        run: echo "${{ secrets.FDROID_KEYSTORE_BASE64 }}" | base64 -d > keystore.jks
+        # NOTE: `secrets.*` is not allowed in a step-level `if:` expression
+        # (workflow fails validation), so the presence check lives in shell.
+        env:
+          FDROID_KEYSTORE_BASE64: ${{ secrets.FDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$FDROID_KEYSTORE_BASE64" ]; then
+            echo "$FDROID_KEYSTORE_BASE64" | base64 -d > keystore.jks
+          else
+            echo "::notice::FDROID_KEYSTORE_BASE64 not set — index will be unsigned."
 
       - name: Update F-Droid index (signed when keystore present)
         run: |
