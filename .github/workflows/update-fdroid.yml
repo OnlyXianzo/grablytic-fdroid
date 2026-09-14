@@ -48,6 +48,7 @@ jobs:
             echo "$FDROID_KEYSTORE_BASE64" | base64 -d > keystore.jks
           else
             echo "::notice::FDROID_KEYSTORE_BASE64 not set — index will be unsigned."
+          fi
 
       - name: Update F-Droid index (signed when keystore present)
         run: |
