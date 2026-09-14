@@ -27,9 +27,12 @@ jobs:
           python-version: '3.11'
 
       - name: Install fdroidserver
+        # NOTE: Ubuntu's apt fdroidserver ships an androguard too old to parse
+        # AGP 8+/Flutter resources.arsc (ResParserError: res1 must be zero).
+        # pip tracks upstream, which handles modern APKs.
         run: |
-          sudo apt-get update
-          sudo apt-get install -y fdroidserver
+          pip install --upgrade fdroidserver
+          fdroid --version
 
       - name: Download latest APKs from Grablytic
         run: |
