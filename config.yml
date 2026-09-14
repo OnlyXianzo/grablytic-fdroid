@@ -1,14 +1,14 @@
-repo_url: "https://onlyxianzo.github.io/truestream-fdroid/repo"
-repo_name: "TrueStream Official F-Droid Repository"
+repo_url: "https://onlyxianzo.github.io/grablytic-fdroid/repo"
+repo_name: "Grablytic Official F-Droid Repository"
 repo_icon: "icon.png"
 repo_description: |
-  Official F-Droid repository for TrueStream — the high-performance,
+  Official F-Droid repository for Grablytic — the high-performance,
   privacy-first media extractor powered by yt-dlp.
-archive_url: "https://onlyxianzo.github.io/truestream-fdroid/archive"
-archive_name: "TrueStream Archive Repository"
+archive_url: "https://onlyxianzo.github.io/grablytic-fdroid/archive"
+archive_name: "Grablytic Archive Repository"
 archive_description: |
-  Historic releases of TrueStream.
+  Historic releases of Grablytic.
 
 keystore: "keystore.jks"
-repo_keyalias: "truestream-fdroid"
+repo_keyalias: "grablytic-fdroid"
 android_home: "/opt/android-sdk"

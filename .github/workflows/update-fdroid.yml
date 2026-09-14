@@ -1,10 +1,10 @@
 name: Update F-Droid Repository
 
-# Self-hosted TrueStream F-Droid repo (https://onlyxianzo.github.io/truestream-fdroid/).
+# Self-hosted Grablytic F-Droid repo (https://onlyxianzo.github.io/grablytic-fdroid/).
 # Moved to repo root: GitHub Actions only runs workflows from .github/workflows/
 # at the repository root (Priya's draft lived under a nested dir and never ran).
 # Triggers: schedule (daily), manual dispatch, or repository_dispatch 'new-release'
-# sent by OnlyXianzo/TrueStream on every published release.
+# sent by OnlyXianzo/Grablytic on every published release.
 
 on:
   repository_dispatch:
@@ -31,10 +31,10 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y fdroidserver
 
-      - name: Download latest APKs from TrueStream
+      - name: Download latest APKs from Grablytic
         run: |
           mkdir -p repo
-          gh release download v0.0.1 --repo OnlyXianzo/TrueStream --pattern "*.apk" --dir repo/ --clobber
+          gh release download v0.0.1 --repo OnlyXianzo/Grablytic --pattern "*.apk" --dir repo/ --clobber
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
