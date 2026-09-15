@@ -40,7 +40,8 @@ jobs:
       - name: Download latest APKs from Grablytic
         run: |
           mkdir -p repo
-          gh release download v0.0.1 --repo OnlyXianzo/Grablytic --pattern "*.apk" --dir repo/ --clobber
+          # No version tag: always track the latest Grablytic release.
+          gh release download --repo OnlyXianzo/Grablytic --pattern "*.apk" --dir repo/ --clobber
           # The 458 MB universal APK stays on GitHub Releases only: F-Droid
           # clients resolve per-ABI builds, and Pages caps sites at 1 GB
           # (git pushes additionally cap single files at 100 MB).
