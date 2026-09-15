@@ -18,7 +18,8 @@ jobs:
     name: Build and Sign F-Droid Index
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
+      pages: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -40,6 +41,10 @@ jobs:
         run: |
           mkdir -p repo
           gh release download v0.0.1 --repo OnlyXianzo/Grablytic --pattern "*.apk" --dir repo/ --clobber
+          # The 458 MB universal APK stays on GitHub Releases only: F-Droid
+          # clients resolve per-ABI builds, and Pages caps sites at 1 GB
+          # (git pushes additionally cap single files at 100 MB).
+          rm -f repo/*universal*.apk
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -77,8 +82,30 @@ jobs:
             exit 1
           fi
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Stage Pages site (public files only)
+        # upload-pages-artifact ships a whole directory: stage exactly what
+        # clients need so .git, workflows, keystore and scratch never upload.
+        run: |
+          mkdir -p site
+          cp -r repo metadata config.yml icon.png README.md site/
+          touch site/.nojekyll
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./
+          path: site/
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: update-repo
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
