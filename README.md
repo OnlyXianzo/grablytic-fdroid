@@ -29,8 +29,11 @@ keytool -genkeypair -alias grablytic-fdroid -keyalg RSA -keysize 4096 \
 keytool -list -rfc -keystore keystore.jks -alias grablytic-fdroid \
   | openssl x509 -noout -fingerprint -sha256
 
-# 3. Store the keystore as a repo secret and re-run the workflow:
+# 3. Store the keystore + password as repo secrets and re-run the workflow:
 base64 -w0 keystore.jks   # save output as secret FDROID_KEYSTORE_BASE64
+# save the store password as secret FDROID_KEYSTORE_PASS
+# (the workflow injects it as keystorepass/keypass at runtime and strips
+# it before Pages deploy, so it is never committed or published)
 rm keystore.jks           # never commit the private key
 ```
 

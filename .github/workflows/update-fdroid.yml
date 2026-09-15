@@ -56,9 +56,17 @@ jobs:
       - name: Update F-Droid index (signed when keystore present)
         # Modern fdroidserver refuses to publish unsigned indexes, so without
         # a keystore this fails fast with directions (see README "Signing").
+        # Passwords come from secrets and are stripped from config.yml before
+        # deploy so they never reach the public Pages branch.
+        env:
+          FDROID_KEYSTORE_PASS: ${{ secrets.FDROID_KEYSTORE_PASS }}
         run: |
           if [ -f keystore.jks ]; then
+            cp config.yml config.yml.bak
+            printf '\nkeystorepass: "%s"\nkeypass: "%s"\n' \
+              "$FDROID_KEYSTORE_PASS" "$FDROID_KEYSTORE_PASS" >> config.yml
             fdroid update --create-metadata
+            mv config.yml.bak config.yml
           else
             echo "::error::FDROID_KEYSTORE_BASE64 secret not set — refusing to publish an unsigned index. One-time setup: see README 'Signing the repository', then re-run."
             exit 1

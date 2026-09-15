@@ -11,4 +11,5 @@ archive_description: |
 
 keystore: "keystore.jks"
 repo_keyalias: "grablytic-fdroid"
+repo_pubkey: "EDDBC26BFDC34088F8FCC37C5B7D196899FD8F9080E94F7EA31B90ABA9E7E9E2"
 android_home: "/opt/android-sdk"
