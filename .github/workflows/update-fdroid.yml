@@ -17,6 +17,8 @@ jobs:
   update-repo:
     name: Build and Sign F-Droid Index
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -67,6 +69,9 @@ jobs:
               "$FDROID_KEYSTORE_PASS" "$FDROID_KEYSTORE_PASS" >> config.yml
             fdroid update --create-metadata
             mv config.yml.bak config.yml
+            # Never publish the private key or scratch state to Pages:
+            rm -f keystore.jks
+            rm -rf tmp
           else
             echo "::error::FDROID_KEYSTORE_BASE64 secret not set — refusing to publish an unsigned index. One-time setup: see README 'Signing the repository', then re-run."
             exit 1
